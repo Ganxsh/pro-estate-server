@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { AuthRequest } from "../middleware/authMiddleware.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "../config/database_pg.js";
