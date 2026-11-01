@@ -47,10 +47,10 @@ async function startServer() {
   try {
     // Run database migrations/table creation
     await createTables();
-    console.log("PostgreSQL connected and tables verified successfully");
+    // console.log("PostgreSQL connected and tables verified successfully");
 
     app.listen(PORT, () => {
-      console.log(`Server running at: http://localhost:${PORT}`);
+      // console.log(`Server running at: http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("Server startup failed:", error);
