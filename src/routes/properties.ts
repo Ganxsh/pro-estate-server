@@ -1,3 +1,4 @@
+
 import { Router } from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import {
@@ -12,26 +13,179 @@ import {
 
 const router = Router();
 
-// 1; /api/properties - Create a list
+/**
+ * @openapi
+ * tags:
+ *   - name: Properties
+ *     description: Property listing and platform statistics APIs
+ */
+
+/**
+ * @openapi
+ * /api/properties:
+ *   post:
+ *     summary: Create a new property listing
+ *     tags: [Properties]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Property'
+ *     responses:
+ *       '201':
+ *         description: Property created successfully
+ *       '400':
+ *         description: Invalid property data
+ *       '401':
+ *         description: Unauthorized
+ */
 router.post("/", authenticateToken, createProperty);
 
-// 2; /api/properties - Browse/search listings (Public)
+/**
+ * @openapi
+ * /api/properties:
+ *   get:
+ *     summary: Browse and search property listings
+ *     tags: [Properties]
+ *     parameters:
+ *       - in: query
+ *         name: city
+ *         schema:
+ *           type: string
+ *         description: Filter properties by city
+ *       - in: query
+ *         name: property_type
+ *         schema:
+ *           type: string
+ *         description: Filter by property type
+ *       - in: query
+ *         name: min_price
+ *         schema:
+ *           type: number
+ *         description: Minimum property price
+ *       - in: query
+ *         name: max_price
+ *         schema:
+ *           type: number
+ *         description: Maximum property price
+ *     responses:
+ *       '200':
+ *         description: Properties retrieved successfully
+ *       '400':
+ *         description: Invalid query parameters
+ */
 router.get("/", getProperties);
 
-// 3; /api/properties/me/properties - View your listings (Authenticated)
-// Note: Place this BEFORE "/:id" so Express doesn't mistake "me" for an ID parameter!
+/**
+ * @openapi
+ * /api/properties/me/properties:
+ *   get:
+ *     summary: Get properties belonging to the logged-in user
+ *     tags: [Properties]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: User properties retrieved successfully
+ *       '401':
+ *         description: Unauthorized
+ */
 router.get("/me/properties", authenticateToken, getMyProperties);
 
-// 7; /api/properties/stats - Platform-wide counts (Public)
+/**
+ * @openapi
+ * /api/properties/stats:
+ *   get:
+ *     summary: Get platform-wide property statistics
+ *     tags: [Properties]
+ *     responses:
+ *       '200':
+ *         description: Platform statistics retrieved successfully
+ *       '500':
+ *         description: Failed to retrieve statistics
+ */
 router.get("/stats", getPlatformStats);
 
-// 4; /api/properties/:id - View single property (Public)
+/**
+ * @openapi
+ * /api/properties/{id}:
+ *   get:
+ *     summary: Get a property by ID
+ *     tags: [Properties]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The property ID
+ *     responses:
+ *       '200':
+ *         description: Property retrieved successfully
+ *       '404':
+ *         description: Property not found
+ */
 router.get("/:id", getPropertyById);
 
-// 5; /api/properties/:id - Update your own listing
+/**
+ * @openapi
+ * /api/properties/{id}:
+ *   patch:
+ *     summary: Update your own property listing
+ *     tags: [Properties]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Property ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PropertyUpdate'
+ *     responses:
+ *       '200':
+ *         description: Property updated successfully
+ *       '400':
+ *         description: Invalid property data
+ *       '401':
+ *         description: Unauthorized
+ *       '404':
+ *         description: Property not found
+ */
 router.patch("/:id", authenticateToken, updateProperty);
 
-// 6; /api/properties/:id - Delete your own list
+/**
+ * @openapi
+ * /api/properties/{id}:
+ *   delete:
+ *     summary: Delete your own property listing
+ *     tags: [Properties]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Property ID
+ *     responses:
+ *       '200':
+ *         description: Property deleted successfully
+ *       '401':
+ *         description: Unauthorized
+ *       '404':
+ *         description: Property not found
+ */
 router.delete("/:id", authenticateToken, deleteProperty);
 
 export default router;

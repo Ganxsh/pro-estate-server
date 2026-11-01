@@ -1,3 +1,4 @@
+
 import { Router } from "express";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 import {
@@ -8,14 +9,83 @@ import {
 
 const router = Router();
 
-// 1. POST /api/inquiries - Send an inquiry about a property (Authenticated)
+/**
+ * @openapi
+ * tags:
+ *   - name: Inquiries
+ *     description: Property inquiry management APIs
+ */
+
+/**
+ * @openapi
+ * /api/inquiries:
+ *   post:
+ *     summary: Send an inquiry about a property
+ *     tags: [Inquiries]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Inquiry'
+ *     responses:
+ *       '201':
+ *         description: Inquiry created successfully
+ *       '400':
+ *         description: Invalid inquiry data
+ *       '401':
+ *         description: Unauthorized
+ */
 router.post("/", authenticateToken, createInquiry);
 
-// 2. GET /api/inquiries/me - View all inquiries sent by the logged-in user (Authenticated)
-// Note: Place this before dynamic parameters like "/property/:propertyId" if needed, though they don't clash here.
+/**
+ * @openapi
+ * /api/inquiries/me:
+ *   get:
+ *     summary: View inquiries sent by the logged-in user
+ *     tags: [Inquiries]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Inquiries retrieved successfully
+ *       '401':
+ *         description: Unauthorized
+ */
 router.get("/me", authenticateToken, getMyInquiries);
 
-// 3. GET /api/inquiries/property/:propertyId - View inquiries for a specific property (Authenticated - Owner only)
-router.get("/property/:propertyId", authenticateToken, getPropertyInquiries);
+/**
+ * @openapi
+ * /api/inquiries/property/{propertyId}:
+ *   get:
+ *     summary: View inquiries for a specific property
+ *     description: Intended for the property owner. Actual access depends on controller authorization.
+ *     tags: [Inquiries]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: propertyId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the property
+ *     responses:
+ *       '200':
+ *         description: Property inquiries retrieved successfully
+ *       '401':
+ *         description: Unauthorized
+ *       '403':
+ *         description: Forbidden
+ *       '404':
+ *         description: Property not found
+ */
+router.get(
+  "/property/:propertyId",
+  authenticateToken,
+  getPropertyInquiries
+);
 
 export default router;

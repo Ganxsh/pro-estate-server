@@ -8,6 +8,8 @@ import createTables from "./sql/schema.js";
 import Routes from "./routes/auth.js"; 
 import PropertyRoutes from "./routes/properties.js";
 import InquiryRoutes from "./routes/inquiries.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 
 // 1. Initialize Express App
 export const app = express();
@@ -44,7 +46,11 @@ app.use("/api/properties", PropertyRoutes);
 app.use("/api/inquiries", InquiryRoutes);
 
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+app.get("/api-docs.json", (_req, res) => {
+  res.json(swaggerSpec);
+});
 
 
 // 4. Port Configuration
